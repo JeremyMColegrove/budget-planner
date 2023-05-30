@@ -23,9 +23,12 @@ function Months() {
       var month = months[i]
       var receipts = await db.getReceiptsAndExpenses(month.id)
       months[i].receipts = receipts.receipts
+      months[i].expenses = receipts.expenses
 
       var total = 0;
+      var averageConversionRate = 0
       for (var receipt of month.receipts) {
+        averageConversionRate += receipt.conversionRate
         if (month.showUSD) {
           total += receipt.USD
           total += receipt.MXN / receipt.conversionRate
@@ -34,6 +37,16 @@ function Months() {
           total += receipt.MXN
         }
       }
+      if (month.receipts.length>0) averageConversionRate /= month.receipts.length
+      for (var expense of month.expenses) {
+        if (month.showUSD && expense.expenseCurrency == "MXN") {
+            total += expense.total / averageConversionRate
+          } else if (!month.showUSD && expense.expenseCurrency == "USD") {
+            total += expense.total * averageConversionRate
+          } else {
+            total += expense.total
+          }
+    }
       months[i].total = total
     }
     setMonths(months);

@@ -1,11 +1,16 @@
 import React, {useEffect, useState} from 'react'
 import DexieDB from './DexieDB'
-import { Doughnut,Line } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend,CategoryScale,LinearScale,PointElement,LineElement,Title, } from "chart.js";
+import { Doughnut,Line, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement,BarElement, Tooltip, Legend,CategoryScale,LinearScale,PointElement,LineElement,Title, } from "chart.js";
 import dayjs from 'dayjs';
 import USDSwitch from './USDSwitch';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale,
+ChartJS.register(
+    ArcElement, 
+    Tooltip, 
+    Legend, 
+    BarElement,
+    CategoryScale,
     LinearScale,
     PointElement,
     LineElement,
@@ -117,7 +122,7 @@ function DataInsight() {
             }
             // datasetCopy[i].total = total
             spending.push(total)
-            labels.push(dayjs(month.date).format("MM"))
+            labels.push(dayjs(month.date).format("MMM"))
           }
 
           setMonthlySpendingData(s=>{
@@ -208,7 +213,7 @@ function DataInsight() {
                 <Doughnut data={doughnutData}  />
             </div>
             <div style={{width:'40em'}} className='h-96 flex justify-center items-center border-dashed border-2 my-3 border-slate-200'>
-                <Line options={options} data={monthlySpendingData} />
+                <Bar options={options} data={monthlySpendingData} />
             </div>
         </div>
     </div>
