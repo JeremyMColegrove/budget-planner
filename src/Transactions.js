@@ -165,7 +165,7 @@ function Transactions() {
                 <IconButton onClick={()=>navigate(-1)}>
                     <ArrowBackIcon/>
                 </IconButton>
-                <p className='text-4xl font-bold ml-4'>{state.receipt.name} - {dayjs(state.receipt.date).format("MM/DD/YYYY")}</p>
+                <p className='text-4xl font-bold ml-4'>{state.receipt.name} - {dayjs(state.receipt.date.$d).format("MM/DD/YYYY")}</p>
             </div>
             <div className="flex">
                 <form onBlur={saveConversionRate} onSubmit={saveConversionRate} className="flex items-center">

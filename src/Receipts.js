@@ -87,7 +87,9 @@ function Receipts() {
 
   const fetchData = async () => {
     const db = new DexieDB();
-    const receipts = await db.getReceiptsAndExpenses(state.month.id);
+    const receipts = await db.getReceiptsAndExpenses(state.month.id)
+    receipts.receipts.forEach(r=>r.date = dayjs(r.date))
+    receipts.receipts.sort((a,b)=>a.date.isAfter(b.date)?-1:1);
     // console.log(receipts)
     setData(receipts);
   }
@@ -192,7 +194,7 @@ const deleteReceiptsAndExpenses = async () => {
                         </tr>
 
 
-                        {data.receipts?.sort((a,b)=>dayjs(a.date).isAfter(dayjs(b.date))).map(receipt => receiptComponent(receipt))}
+                        {data.receipts?.map(receipt => receiptComponent(receipt))}
                     </tbody>
                 </table>
                 <input type="submit" hidden/>
