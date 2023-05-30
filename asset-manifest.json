@@ -1,16 +1,13 @@
 {
   "files": {
-    "main.css": "/budget-planner/static/css/main.073c9b0a.css",
-    "main.js": "/budget-planner/static/js/main.9037abfe.js",
-    "static/js/787.182e2f30.chunk.js": "/budget-planner/static/js/787.182e2f30.chunk.js",
-    "static/media/logo.svg": "/budget-planner/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "main.css": "/budget-planner/static/css/main.19994834.css",
+    "main.js": "/budget-planner/static/js/main.eb573a5c.js",
     "index.html": "/budget-planner/index.html",
-    "main.073c9b0a.css.map": "/budget-planner/static/css/main.073c9b0a.css.map",
-    "main.9037abfe.js.map": "/budget-planner/static/js/main.9037abfe.js.map",
-    "787.182e2f30.chunk.js.map": "/budget-planner/static/js/787.182e2f30.chunk.js.map"
+    "main.19994834.css.map": "/budget-planner/static/css/main.19994834.css.map",
+    "main.eb573a5c.js.map": "/budget-planner/static/js/main.eb573a5c.js.map"
   },
   "entrypoints": [
-    "static/css/main.073c9b0a.css",
-    "static/js/main.9037abfe.js"
+    "static/css/main.19994834.css",
+    "static/js/main.eb573a5c.js"
   ]
 }
