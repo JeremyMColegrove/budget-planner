@@ -33,8 +33,8 @@ function Months() {
           total += receipt.USD * receipt.conversionRate
           total += receipt.MXN
         }
-        months[i].total = total
       }
+      months[i].total = total
     }
     setMonths(months);
   }
@@ -53,7 +53,7 @@ function Months() {
                 <Link to={`/receipts`} state={{month:month}} key={month.id} >
                     <div className='p-8 font-medium'>{dayjs(month.name).format("MMM, YYYY")}</div>
                     <hr></hr>
-                    <div className='px-8 py-4'>{`$${month.total.toFixed(2)} ${month.showUSD?"USD":"MXN"}`}</div>
+                    <div className='px-8 py-4'>{`$${month.total?.toFixed(2)} ${month.showUSD?"USD":"MXN"}`}</div>
                 </Link>
             </div>
     )
