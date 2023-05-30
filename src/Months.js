@@ -142,7 +142,7 @@ function Months() {
   
   return (
     <div className="w-full px-20 py-8">
-        <button onClick={deleteMonths}>Delete All Data</button>
+        {/* <button onClick={deleteMonths}>Delete All Data</button> */}
         <div className="flex justify-between items-center">
             <p className='text-4xl font-bold pb-8'>Current Month</p>
             <div className='flex'>
