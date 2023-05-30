@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -21,20 +21,21 @@ function Transactions() {
     const [transactions, setTransactions] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
+    const transactionNameRef = useRef(null);
     const state = location.state;
     const [edit, setEdit] = useState(false)
     const [selected, setSelected] = useState([])
     const [adding, setAdding] = useState(false)
-    
-    const [newName, setNewName] = useState("")
-    const [newCatagory, setNewCatagory] = useState("Food")
+    const [newTransactionType, setNewTransactionType] = useState("Purchase")
+    const [newName, setNewName] = useState("")  
+    const [newCategory, setNewCatagory] = useState("Food")
     const [newPrice, setNewPrice] = useState(0.0)
     const [newCurrency, setNewCurrency] = useState("MXN")
     const [conversionRate, setConversionRate] = useState(0)
     const updateConversionRate = (e) => setConversionRate(e.target.value)
-
+    const updateNewTransactionType = (e) => setNewTransactionType(e.target.value)
     const updateNewName = (e)=> setNewName(e.target.value)
-    const updateCatagory = (e)=> setNewCatagory(e.target.value)
+    const updateCategory = (e)=> setNewCatagory(e.target.value)
     const updateNewPrice = (e)=> setNewPrice(e.target.value)
     const updateNewCurrency = (_, currency)=> {
         if (currency != null)
@@ -57,20 +58,16 @@ function Transactions() {
   const addTransaction = async (e) => {
     e.preventDefault()
     const db = new DexieDB();
-    await db.addTransaction(state.receipt.id, newName, parseFloat(newPrice), newCurrency, newCatagory);
+    await db.addTransaction(state.receipt.id, newName, parseFloat(newPrice), newCurrency, newCategory);
 
     setNewName("")
     setNewCatagory("Food")
     setNewPrice(0.0)
     fetchData();
-  }
 
-  // Transactions.js
-
-const deleteTransaction = async (transactionId) => {
-    const db = new DexieDB();
-    await db.deleteTransaction(transactionId);
-    fetchData();
+    // put focus back to name box
+    // window.focus()
+    transactionNameRef.current.focus()
   }
 
   function toggleTransaction(transaction) {
@@ -81,15 +78,7 @@ const deleteTransaction = async (transactionId) => {
     }
   }
   
-  function transactionComponent(transaction) {
-    return (
-        <tr className=' shadow-sm w-full bg-slate-50 border-dashed border-2 rounded-sm ' key={transaction.id}>
-            <td>{edit && <input onChange={()=>toggleTransaction(transaction)} className='mr-2' type="checkbox"/>} {transaction.name}</td>
-            <td>{transaction.catagory}</td>
-            <td>${transaction.price} {transaction.transactionCurrency}</td>
-        </tr>
-    )
-  }
+  
 
   async function deleteTransactions() {
     const db = new DexieDB();
@@ -111,6 +100,63 @@ const deleteTransaction = async (transactionId) => {
         await db.updateConversionRate(state.receipt.id, conversionRate)
     }
   }
+
+
+  const purchaseComponent = () => {
+    return (
+        <tr className='bg-slate-50'>
+            <td>
+                <input ref={transactionNameRef} required type="text" value={newName} placeholder='Item Name' onChange={updateNewName} className='w-72 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200'></input>
+            </td>
+            <td>
+                <FormControl required size='small' className='w-48'>
+                    <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                    <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={newCategory}
+                    label="Category"
+                    onChange={updateCategory}
+                    >
+                    <MenuItem value={"Food"}>Food</MenuItem>
+                    <MenuItem value={"Transportation"}>Transportation</MenuItem>
+                    <MenuItem value={"Personal Care"}>Personal Care</MenuItem>
+                    <MenuItem value={"Entertainment"}>Entertainment</MenuItem>
+                    <MenuItem value={"Clothing"}>Clothing</MenuItem>
+                    <MenuItem value={"Miscellaneous"}>Miscellaneous</MenuItem>
+                    <MenuItem value={"Tax"}>Tax</MenuItem>
+                    <MenuItem value={"Discount"}>Discount</MenuItem>
+                    </Select>
+                </FormControl>
+            </td>
+            <td className='flex items-center'>
+                <input required type="number" step="any" className='w-24 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200' value={newPrice} onChange={updateNewPrice}></input>
+                <ToggleButtonGroup
+                    color="primary"
+                    value={newCurrency}
+                    exclusive
+                    size='small'
+                    onChange={updateNewCurrency}
+                    aria-label="Platform"
+                    className='items-center justify-center p-2'
+                >
+                    <ToggleButton value="USD">USD</ToggleButton>
+                    <ToggleButton value="MXN">MXN</ToggleButton>
+
+                </ToggleButtonGroup>
+                <button type="submit" className='hidden'></button>
+            </td>          
+        </tr>
+    )}
+    function transactionComponent(transaction) {
+        return (
+            <tr className={`shadow-sm w-full bg-slate-50 rounded-sm outline-dashed outline-2 outline-slate-200`} key={transaction.id}>
+                <td>{edit && <input onChange={()=>toggleTransaction(transaction)} className='mr-2' type="checkbox"/>} {transaction.name}</td>
+                <td>{transaction.catagory}</td>
+                <td>${transaction.price} {transaction.transactionCurrency}</td>
+            </tr>
+        )
+      }
 
   return (
     <div className=" w-full px-20 py-8">
@@ -141,61 +187,19 @@ const deleteTransaction = async (transactionId) => {
         </div>
 
         
-
+        
         <form onSubmit={addTransaction}>
             <table className='w-full'>
                 <thead>
 
                     <tr className='text-left'>
                         <th>Name</th>
-                        <th>Catagory</th>
-                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Amount</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <input required type="text" value={newName} placeholder='Item Name' onChange={updateNewName} className='w-72 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200'></input>
-                        </td>
-                        <td>
-                            <FormControl required size='small' className='w-48'>
-                                <InputLabel id="demo-simple-select-label">Catagory</InputLabel>
-                                <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={newCatagory}
-                                label="Catagory"
-                                onChange={updateCatagory}
-                                >
-                                <MenuItem value={"Food"}>Food</MenuItem>
-                                <MenuItem value={"Transportation"}>Transportation</MenuItem>
-                                <MenuItem value={"Healthcare"}>Healthcare</MenuItem>
-                                <MenuItem value={"Personal Care"}>Personal Care</MenuItem>
-                                <MenuItem value={"Entertainment"}>Entertainment</MenuItem>
-                                <MenuItem value={"Clothing"}>Clothing</MenuItem>
-                                <MenuItem value={"Miscellaneous/Unexpected Expenses"}>Miscellaneous/Unexpected Expenses</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </td>
-                        <td className='flex items-center'>
-                            <input min={0} required type="number" step="any" className='w-24 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200' value={newPrice} onChange={updateNewPrice}></input>
-                            <ToggleButtonGroup
-                                color="primary"
-                                value={newCurrency}
-                                exclusive
-                                size='small'
-                                onChange={updateNewCurrency}
-                                aria-label="Platform"
-                                className='items-center justify-center p-2'
-                            >
-                                <ToggleButton value="USD">USD</ToggleButton>
-                                <ToggleButton value="MXN">MXN</ToggleButton>
-
-                            </ToggleButtonGroup>
-                            <button type="submit" className='hidden'></button>
-                        </td>
-                            
-                    </tr>
+                    {purchaseComponent()}
                     {transactions.map(t => transactionComponent(t)).reverse()}
                 </tbody>
             </table>

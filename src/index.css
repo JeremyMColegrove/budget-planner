@@ -8,8 +8,9 @@ table {
 
   }
 
-tbody>tr {outline: thin dashed black;}
-tfoot>tr {outline: thin dashed rgb(192, 192, 192);}
+/* tbody>tr {outline: thin dashed black;} */
+/* tfoot>tr {outline: thin dashed rgb(192, 192, 192);} */
+
 td,th {
 padding: 0.5em;
 }
