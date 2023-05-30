@@ -52,9 +52,6 @@ function Receipts() {
         await db.updateMonthCurrency(state.month.id, e.target.checked)
     }
 
-
-    
-
   useEffect(() => {
     if (state.month)
         fetchData();
@@ -125,7 +122,7 @@ const deleteReceiptsAndExpenses = async () => {
 
   function receiptComponent(receipt) {
     return (
-        <tr key={receipt.id} onClick={()=>!edit ? navigate("/transactions", {state:{month:state.month, receipt}}):null} className='shadow-sm w-full bg-slate-50 outline-dashed outline-2 outline-slate-200 rounded-sm hover:bg-slate-100 hover:cursor-pointer'>
+        <tr key={receipt.id} onClick={()=>!edit ? navigate("/budget-planner/transactions", {state:{month:state.month, receipt}}):null} className='shadow-sm w-full bg-slate-50 outline-dashed outline-2 outline-slate-200 rounded-sm hover:bg-slate-100 hover:cursor-pointer'>
             <td>
                 {edit && <input onChange={()=>toggleReceipt(receipt)} className='mr-2' type="checkbox"/>} {receipt.name}
             </td>

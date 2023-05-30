@@ -50,7 +50,7 @@ function Months() {
   function monthComponent(month) {
     return (
             <div className='rounded-sm border-2 border-solid hover:bg-slate-100 border-gray-200 flex bg-slate-50 shadow-sm'>
-                <Link to={`/receipts`} state={{month:month}} key={month.id} >
+                <Link to={`budget-planner/receipts`} state={{month:month}} key={month.id} >
                     <div className='p-8 font-medium'>{dayjs(month.name).format("MMM, YYYY")}</div>
                     <hr></hr>
                     <div className='px-8 py-4'>{`$${month.total?.toFixed(2)} ${month.showUSD?"USD":"MXN"}`}</div>

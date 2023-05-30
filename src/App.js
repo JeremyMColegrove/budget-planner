@@ -12,8 +12,8 @@ import DataInsight from './DataInsight.js';
 const Overview = () => {
   return <Router>
       <Routes>
-        <Route path="/receipts" element={<Receipts />}/>
-        <Route path="/transactions" element={<Transactions />}/>
+        <Route path="budget-planner/receipts" element={<Receipts />}/>
+        <Route path="budget-planner/transactions" element={<Transactions />}/>
         <Route path="*" element={<Months/>}/>
       </Routes>
     </Router>
