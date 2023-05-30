@@ -18,7 +18,24 @@ function Months() {
 
   async function fetchData() {
     const db = new DexieDB();
-    const months = await db.getMonths();
+    var months = await db.getMonths();
+    for (var i = 0; i<months.length; i++) {
+      var month = months[i]
+      var receipts = await db.getReceiptsAndExpenses(month.id)
+      months[i].receipts = receipts.receipts
+
+      var total = 0;
+      for (var receipt of month.receipts) {
+        if (month.showUSD) {
+          total += receipt.USD
+          total += receipt.MXN / receipt.conversionRate
+        } else {
+          total += receipt.USD * receipt.conversionRate
+          total += receipt.MXN
+        }
+        months[i].total = total
+      }
+    }
     setMonths(months);
   }
 
@@ -30,25 +47,13 @@ function Months() {
     fetchData()
   }
 
-  const getCurrency = (month)=> {
-    var total = 0
-    if (month.showUSD && !isNaN(month.USD) && !isNaN(month.MXN)) {
-        total += month.USD
-        total += month.MXN / 17
-    } else if (!month.showUSD && !isNaN(month.USD) && !isNaN(month.MXN)) {
-        total += month.USD * 17
-        total += month.MXN
-    }
-    return `$${total.toFixed(2)} ${month.showUSD?"USD":"MXN"}`
-  }
-
   function monthComponent(month) {
     return (
             <div className='rounded-sm border-2 border-solid hover:bg-slate-100 border-gray-200 flex bg-slate-50 shadow-sm'>
                 <Link to={`/receipts`} state={{month:month}} key={month.id} >
                     <div className='p-8 font-medium'>{dayjs(month.name).format("MMM, YYYY")}</div>
                     <hr></hr>
-                    <div className='px-8 py-4'>{getCurrency(month)}</div>
+                    <div className='px-8 py-4'>{`$${month.total.toFixed(2)} ${month.showUSD?"USD":"MXN"}`}</div>
                 </Link>
             </div>
     )
@@ -137,7 +142,7 @@ function Months() {
   
   return (
     <div className="w-full px-20 py-8">
-        {/* <button onClick={deleteMonths}>Delete All Data</button> */}
+        <button onClick={deleteMonths}>Delete All Data</button>
         <div className="flex justify-between items-center">
             <p className='text-4xl font-bold pb-8'>Current Month</p>
             <div className='flex'>

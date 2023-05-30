@@ -172,7 +172,7 @@ const deleteReceiptsAndExpenses = async () => {
                 {edit && <input onChange={()=>toggleReceipt(receipt)} className='mr-2' type="checkbox"/>} {receipt.name}
             </td>
             <td>{dayjs(receipt.date).format("MM/DD/YYYY")}</td>
-            <td>${displayUSDCurrency?((receipt.USD + receipt.MXN/17).toFixed(2)):(receipt.USD*17+receipt.MXN).toFixed(2)} {displayUSDCurrency?"USD":"MXN"}</td>
+            <td>${displayUSDCurrency?((receipt.USD + receipt.MXN/receipt.conversionRate).toFixed(2)):(receipt.USD*receipt.conversionRate+receipt.MXN).toFixed(2)} {displayUSDCurrency?"USD":"MXN"}</td>
         </tr>
     )
   }

@@ -30,6 +30,9 @@ function Transactions() {
     const [newCatagory, setNewCatagory] = useState("Food")
     const [newPrice, setNewPrice] = useState(0.0)
     const [newCurrency, setNewCurrency] = useState("MXN")
+    const [conversionRate, setConversionRate] = useState(0)
+    const updateConversionRate = (e) => setConversionRate(e.target.value)
+
     const updateNewName = (e)=> setNewName(e.target.value)
     const updateCatagory = (e)=> setNewCatagory(e.target.value)
     const updateNewPrice = (e)=> setNewPrice(e.target.value)
@@ -47,6 +50,7 @@ function Transactions() {
   const fetchData = async () => {
     const db = new DexieDB();
     const transactions = await db.getTransactions(state.receipt.id);
+    setConversionRate(state.receipt.conversionRate)
     setTransactions(transactions);
   }
 
@@ -100,13 +104,28 @@ const deleteTransaction = async (transactionId) => {
     setSelected([]);
   }
 
+  const saveConversionRate = async (e) => {
+    e.preventDefault()
+    if (conversionRate != state.receipt.conversionRate) {
+        const db = new DexieDB()
+        await db.updateConversionRate(state.receipt.id, conversionRate)
+    }
+  }
+
   return (
     <div className=" w-full px-20 py-8">
-        <div className='flex items-center mb-8'>
-            <IconButton onClick={()=>navigate(-1)}>
-                <ArrowBackIcon/>
-            </IconButton>
-            <p className='text-4xl font-bold ml-4'>{state.receipt.name} - {dayjs(state.receipt.date).format("MM/DD/YYYY")}</p>
+        <div className='flex items-center mb-8 justify-between'>
+            <div className="flex">
+                <IconButton onClick={()=>navigate(-1)}>
+                    <ArrowBackIcon/>
+                </IconButton>
+                <p className='text-4xl font-bold ml-4'>{state.receipt.name} - {dayjs(state.receipt.date).format("MM/DD/YYYY")}</p>
+            </div>
+            <div className="flex">
+                <form onBlur={saveConversionRate} onSubmit={saveConversionRate} className="flex items-center">
+                    <p className='mr-4 font-bold'>MXN→USD</p><input step="any" type="number" min={0} value={conversionRate} onChange={updateConversionRate} className='w-28 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200'></input>
+                </form>
+            </div>
         </div>
             
         

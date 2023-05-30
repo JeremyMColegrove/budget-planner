@@ -7,9 +7,9 @@ class DexieDB extends Dexie {
   constructor() {
     super('BudgetApp');
 
-    this.version(7).stores({
+    this.version(8).stores({
         months: '++id, name, MXN, USD, showUSD',
-        receipts: '++id, monthId, name, USD, MXN, date',
+        receipts: '++id, monthId, name, USD, MXN, date, conversionRate',
         transactions: '++id, catagory, receiptId, name, price, transactionCurrency',
         expenses: '++id, monthId, name, price, expenseCurrency'
     });
@@ -29,6 +29,12 @@ class DexieDB extends Dexie {
     if (!lastMonth || this.isNewMonth(lastMonth.name)) {
       await this.addMonth();
     }
+  }
+
+  async updateConversionRate(receiptId, conversionRate) {
+    var receipt = await this.receipts.get(receiptId)
+    receipt.conversionRate = conversionRate
+    await this.receipts.put(receipt)
   }
 
   async clearData() {
@@ -90,7 +96,7 @@ class DexieDB extends Dexie {
   }
 
   async addReceipt(monthId, name, date) {
-    await this.receipts.add({ monthId: monthId, name, USD:0, MXN:0, date});
+    await this.receipts.add({ monthId: monthId, name, USD:0, MXN:0, date, conversionRate:16});
   }
 
   async addExpense(monthId, name, price, expenseCurrency) {
