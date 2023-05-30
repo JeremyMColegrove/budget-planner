@@ -1,4 +1,7 @@
 import Dexie from 'dexie';
+import 'dexie-export-import'; // Import the Dexie export/import addon
+import dayjs from 'dayjs';
+
 
 class DexieDB extends Dexie {
   constructor() {
@@ -19,6 +22,8 @@ class DexieDB extends Dexie {
     this.initialize();
   }
 
+  
+
   async initialize() {
     const lastMonth = await this.months.toCollection().last();
     if (!lastMonth || this.isNewMonth(lastMonth.name)) {
@@ -26,10 +31,27 @@ class DexieDB extends Dexie {
     }
   }
 
+  async clearData() {
+    await this.months.clear();
+    await this.receipts.clear();
+    await this.transactions.clear();
+    await this.expenses.clear();
+  }
+
+    // Export the database
+    exportDB() {
+        return this.export();
+    }
+
+    // Import a database
+    importDB(blob) {
+        return this.import(blob);
+    }
+
   isNewMonth(lastMonthName) {
-    const lastMonthDate = new Date(lastMonthName);
-    const currentMonth = new Date();
-    return lastMonthDate.getMonth() !== currentMonth.getMonth() || lastMonthDate.getFullYear() !== currentMonth.getFullYear();
+    const lastMonthDate = dayjs(lastMonthName);
+    const currentMonth = dayjs()
+    return lastMonthDate.get("month") !== currentMonth.get("month") || lastMonthDate.get("year") !== currentMonth.get("year");
   }
 
   async updateMonthCurrency(monthId, showUSD) {
@@ -46,7 +68,8 @@ class DexieDB extends Dexie {
   }
 
   async addMonth() {
-    const monthName = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+    const monthName = dayjs().$d.toString()
+    // console.log(monthName.toString())
     await this.months.add({ name: monthName, USD:0, MXN:0, showUSD:true});
   }
 
@@ -159,6 +182,51 @@ async deleteReceiptsAndExpenses(selected, monthId) {
     await this.receipts.put(receipt)
     await this.transactions.bulkDelete(selected)
   }
+
+  // Add this method to your DexieDB class
+
+  async fetchData() {
+    const months = await this.getMonths();
+    const data = [];
+  
+    for (const month of months) {
+      const { receipts, expenses } = await this.getReceiptsAndExpenses(month.id);
+      const monthData = {
+        monthName: month.name,
+        MXN: month.MXN,
+        USD: month.USD,
+        showUSD: month.showUSD,
+        receipts: [],
+        expenses: []
+      };
+  
+      for (const receipt of receipts) {
+        const transactions = await this.getTransactions(receipt.id);
+        monthData.receipts.push({
+          receiptName: receipt.name,
+          USD: receipt.USD,
+          MXN: receipt.MXN,
+          date: receipt.date,
+          transactions
+        });
+      }
+  
+      for (const expense of expenses) {
+        monthData.expenses.push({
+          expenseName: expense.name,
+          price: expense.price,
+          expenseCurrency: expense.expenseCurrency
+        });
+      }
+  
+      data.push(monthData);
+    }
+  
+    return data;
+  }
+  
+  
 }
+
 
 export default DexieDB;

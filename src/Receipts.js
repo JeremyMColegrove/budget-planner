@@ -5,7 +5,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { styled } from '@mui/material/styles';
-
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Switch, { SwitchProps } from '@mui/material/Switch';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
@@ -31,7 +32,7 @@ function Receipts() {
     const [newCatagory, setNewCatagory] = useState("Food")
     const [newPrice, setNewPrice] = useState(0.0)
     const [newCurrency, setNewCurrency] = useState("MXN")
-    const [newReceiptDate, setNewReceiptDate] = useState(null)
+    const [newReceiptDate, setNewReceiptDate] = useState(dayjs())
     const updateNewReceiptDate = (date) => setNewReceiptDate(date)
     const updateNewReceiptName = (e)=> setNewReceiptName(e.target.value)
     const updateNewExpenseName = (e) => setNewExpenseName(e.target.value)
@@ -49,11 +50,7 @@ function Receipts() {
         setDisplayUSDCurrency(e.target.checked)
         await db.updateMonthCurrency(state.month.id, e.target.checked)
     }
-    
 
-    useEffect(()=>{
-        console.log(displayUSDCurrency)
-    }, [displayUSDCurrency])
 
     const MaterialUISwitch = styled(Switch)(({ theme }) => ({
         width: 62,
@@ -142,17 +139,20 @@ function Receipts() {
   const addReceipt = async (e) => {
     e.preventDefault()
     const db = new DexieDB();
-    await db.addReceipt(state.month.id, newReceiptName, newReceiptDate.$d);
-    // console.log(newReceiptDate)
-    setNewReceiptDate(null)
+    let date = newReceiptDate?.$d ? newReceiptDate.$d : dayjs().$d
+    await db.addReceipt(state.month.id, newReceiptName, date);
+    setNewReceiptDate(dayjs())
     setNewReceiptName("")
 
     fetchData();
   }
 
-  const addExpense = async () => {
+  const addExpense = async (e) => {
+    e.preventDefault()
     const db = new DexieDB();
-    await db.addExpense(state.month.id, "Rent", 13000, "USD");
+    await db.addExpense(state.month.id, newExpenseName, parseFloat(newPrice), newCurrency);
+    setNewPrice(0)
+    setNewCurrency(state.month.showUSD?"USD":"MXN")
     fetchData();
   }
   
@@ -183,7 +183,7 @@ const deleteReceiptsAndExpenses = async () => {
             <td>
             {edit && <input onChange={()=>toggleExpense(expense)} className='mr-2' type="checkbox"/>} {expense.name}
             </td>
-            <td>${expense.USD}</td>
+            <td>${expense.total}</td>
         </tr>
     )
   }
@@ -200,7 +200,7 @@ const deleteReceiptsAndExpenses = async () => {
             <IconButton onClick={()=>navigate(-1)}>
                 <ArrowBackIcon/>
             </IconButton>
-            <p className='text-4xl font-bold ml-4'>{state.month?.name}</p>
+            <p className='text-4xl font-bold ml-4'>{dayjs(state.month?.name).format("MMM")}</p>
         </div>
         <div className='flex'>
             {!edit && <button disabled={data.receipts?.length<1 && data.expenses?.length<1} className='disabled:opacity-50 p-2 px-4 rounded-lg mx-4 text-white bg-slate-500 ' onClick={toggleEdit}>Edit</button>}
@@ -221,13 +221,6 @@ const deleteReceiptsAndExpenses = async () => {
                 <p className='font-bold  text-2xl'>Receipts</p>
                 <hr></hr>
                 <table className='w-full text-left'>
-                    {/* <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead> */}
                     <tbody>
                         <tr>
                             <td>
@@ -235,7 +228,7 @@ const deleteReceiptsAndExpenses = async () => {
                             </td>
                             <td>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker  slotProps={{ textField: { size: 'small', fullWidth:true, required:true } }} value={newReceiptDate} onChange={updateNewReceiptDate}/>
+                                <DatePicker  slotProps={{ textField: { size: 'small',  className:"w-44" } }} value={newReceiptDate} onChange={updateNewReceiptDate}/>
                             </LocalizationProvider>
                             </td>
                         </tr>
@@ -247,30 +240,38 @@ const deleteReceiptsAndExpenses = async () => {
                 <input type="submit" hidden/>
             </form>
 
-            <form className='w-full ml-2 mt-2 '>
+            <form className='w-full ml-2 mt-2 ' onSubmit={addExpense}>
                 <p className='font-bold  text-2xl'>Expenses</p>
                 <hr></hr>
                 <table className='w-full text-left'>
-                    {/* <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead> */}
                     <tbody>
                         <tr>
                             <td>
                                 <input required type="text" value={newExpenseName} placeholder='Expense Name' onChange={updateNewExpenseName} className='w-40 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200'></input>
                             </td>
-                            <td>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker  slotProps={{ textField: { size: 'small', fullWidth:true, required:true } }} value={newReceiptDate} onChange={updateNewReceiptDate}/>
-                            </LocalizationProvider>
+                            <td className='flex items-center'>
+
+                                <input min={0} required type="number" step="any" className='w-24 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200' value={newPrice} onChange={updateNewPrice}></input>
+                                <ToggleButtonGroup
+                                    color="primary"
+                                    value={newCurrency}
+                                    exclusive
+                                    size='small'
+                                    onChange={updateNewCurrency}
+                                    aria-label="Platform"
+                                    className='items-center justify-center ml-4'
+                                >
+                                    <ToggleButton value="USD">USD</ToggleButton>
+                                    <ToggleButton value="MXN">MXN</ToggleButton>
+
+                                </ToggleButtonGroup>
                             </td>
+
                         </tr>
                         {data.expenses?.map(receipt => expenseComponent(receipt)).reverse()}
                     </tbody>
                 </table>
+                <input type="submit" hidden/>
             </form>
 
         </div>

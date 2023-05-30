@@ -51,7 +51,6 @@ function Transactions() {
   }
 
   const addTransaction = async (e) => {
-    console.log("Submitting form")
     e.preventDefault()
     const db = new DexieDB();
     await db.addTransaction(state.receipt.id, newName, parseFloat(newPrice), newCurrency, newCatagory);
@@ -159,29 +158,22 @@ const deleteTransaction = async (transactionId) => {
                                 </Select>
                             </FormControl>
                         </td>
-                        <td>
-                            <div className='flex items-center'>
-                                <input min={0} required type="number" step="any" className='w-24 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200' value={newPrice} onChange={updateNewPrice}></input>
-                                {/* <FormControlLabel
-                                    className='m-0'
-                                    control={<MaterialUISwitch sx={{ ml: 2 }} defaultChecked />}
-                                    onChange={updateNewCurrency}
-                                /> */}
-                                <ToggleButtonGroup
-                                    color="primary"
-                                    value={newCurrency}
-                                    exclusive
-                                    size='small'
-                                    onChange={updateNewCurrency}
-                                    aria-label="Platform"
-                                    className='items-center justify-center p-2'
-                                >
-                                    <ToggleButton value="USD">USD</ToggleButton>
-                                    <ToggleButton value="MXN">MXN</ToggleButton>
+                        <td className='flex items-center'>
+                            <input min={0} required type="number" step="any" className='w-24 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200' value={newPrice} onChange={updateNewPrice}></input>
+                            <ToggleButtonGroup
+                                color="primary"
+                                value={newCurrency}
+                                exclusive
+                                size='small'
+                                onChange={updateNewCurrency}
+                                aria-label="Platform"
+                                className='items-center justify-center p-2'
+                            >
+                                <ToggleButton value="USD">USD</ToggleButton>
+                                <ToggleButton value="MXN">MXN</ToggleButton>
 
-                                </ToggleButtonGroup>
-                                <button type="submit" className='hidden'></button>
-                            </div>
+                            </ToggleButtonGroup>
+                            <button type="submit" className='hidden'></button>
                         </td>
                             
                     </tr>
