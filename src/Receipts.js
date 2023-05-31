@@ -127,18 +127,18 @@ const deleteReceiptsAndExpenses = async () => {
                 {edit && <input onChange={()=>toggleReceipt(receipt)} className='mr-2' type="checkbox"/>} {receipt.name}
             </td>
             <td>{dayjs(receipt.date).format("MM/DD/YYYY")}</td>
-            <td>${displayUSDCurrency?((receipt.USD + receipt.MXN/receipt.conversionRate).toFixed(2)):(receipt.USD*receipt.conversionRate+receipt.MXN).toFixed(2)} {displayUSDCurrency?"USD":"MXN"}</td>
+            <td className='flex items-center justify-between'><p>${displayUSDCurrency?((receipt.USD + receipt.MXN/receipt.conversionRate).toFixed(2)):(receipt.USD*receipt.conversionRate+receipt.MXN).toFixed(2)}</p><p className='text-blue-300'>{displayUSDCurrency?"USD":"MXN"}</p></td>
         </tr>
     )
   }
 
   function expenseComponent(expense) {
     return (
-        <tr key={expense.id} className='shadow-sm w-full bg-slate-50 rounded-sm outline-dashed outline-2 outline-slate-200'>
+        <tr key={expense.id} className='shadow-sm w-full bg-slate-50 rounded-sm'>
             <td>
             {edit && <input onChange={()=>toggleExpense(expense)} className='mr-2' type="checkbox"/>} {expense.name}
             </td>
-            <td>${expense.total}</td>
+            <td className='flex items-center justify-between'><p>${expense.total}</p><p className='text-blue-300'>{expense.expenseCurrency=="USD"?"USD":"MXN"}</p></td>
         </tr>
     )
   }
@@ -151,25 +151,24 @@ const deleteReceiptsAndExpenses = async () => {
   
   return (
     <div className=" w-full px-20 py-8">
-        <div className='flex items-center mb-8'>
-            <IconButton onClick={()=>navigate(-1)}>
-                <ArrowBackIcon/>
-            </IconButton>
-            <p className='text-4xl font-bold ml-4'>{dayjs(state.month?.name).format("MMM")}</p>
-        </div>
-        <div className='flex'>
-            {!edit && <button disabled={data.receipts?.length<1 && data.expenses?.length<1} className='disabled:opacity-50 p-2 px-4 rounded-lg mx-4 text-white bg-slate-500 ' onClick={toggleEdit}>Edit</button>}
-            {edit && (
-                <div>
-                    <button className='p-2 rounded-lg mx-4 text-white bg-slate-500 ' onClick={toggleEdit}>Cancel</button>
+        <div className='flex items-center justify-between mb-8'>
+            <div className='flex items-center'>
+              <IconButton onClick={()=>navigate(-1)}>
+                  <ArrowBackIcon/>
+              </IconButton>
+              <p className='text-4xl font-bold ml-4'>{dayjs(state.month?.name).format("MMM, YYYY")}</p>
+            </div>
+            <div className='flex items-center'>
+              {!edit && <button disabled={data.receipts?.length<1 && data.expenses?.length<1} className='disabled:opacity-50 p-2 px-4 rounded-lg mx-4 text-white bg-slate-500 ' onClick={toggleEdit}>Edit</button>}
+              {edit && (
+                  <div>
                     <button className='p-2 rounded-lg mx-4 text-white bg-red-500 ' onClick={deleteReceiptsAndExpenses}>Delete</button>
-                </div>
-            )}
-            <USDSwitch current={displayUSDCurrency} handleSwitch={updateDisplayUSDCurrency}/>
-            {/* <FormControlLabel
-                control={<MaterialUISwitch  checked={displayUSDCurrency} onChange={updateDisplayUSDCurrency} />}
-                label="Currency Display"
-            /> */}
+                    <button className='p-2 rounded-lg mx-4 text-white bg-slate-500 ' onClick={toggleEdit}>Cancel</button>
+
+                  </div>
+              )}
+              <USDSwitch current={displayUSDCurrency} handleSwitch={updateDisplayUSDCurrency}/>
+            </div>
         </div>
         
         <div className='flex'>      
@@ -206,7 +205,7 @@ const deleteReceiptsAndExpenses = async () => {
                             <td>
                                 <input required type="text" value={newExpenseName} placeholder='Expense Name' onChange={updateNewExpenseName} className='w-40 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200'></input>
                             </td>
-                            <td className='flex items-center'>
+                            <td className='flex items-center justify-end'>
 
                                 <input min={0} required type="number" step="any" className='w-24 h-8 rounded-lg border-2 p-4 focus:outline-0 border-slate-200' value={newPrice} onChange={updateNewPrice}></input>
                                 <ToggleButtonGroup

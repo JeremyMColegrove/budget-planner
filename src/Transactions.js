@@ -153,7 +153,7 @@ function Transactions() {
             <tr className={`shadow-sm w-full bg-slate-50 rounded-sm outline-dashed outline-2 outline-slate-200`} key={transaction.id}>
                 <td>{edit && <input onChange={()=>toggleTransaction(transaction)} className='mr-2' type="checkbox"/>} {transaction.name}</td>
                 <td>{transaction.catagory}</td>
-                <td>${transaction.price} {transaction.transactionCurrency}</td>
+                <td className='flex items-center justify-between'><p>${transaction.price}</p><p className='text-blue-300'>{transaction.transactionCurrency}</p></td>
             </tr>
         )
       }
