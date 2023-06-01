@@ -111,11 +111,13 @@ function DataInsight() {
               }
             }
             averageConversion /= month.receipts.length
+
+            // use average comparison for calculating expense price
             for (var expense of month.expenses) {
                 if (showUSD && expense.expenseCurrency == "MXN") {
-                    total += expense.price / averageConversion
-                  } else if (!showUSD && expense.expenseCurrency == "USD") {
                     total += expense.price * averageConversion
+                  } else if (!showUSD && expense.expenseCurrency == "USD") {
+                    total += expense.price / averageConversion
                   } else {
                     total += expense.price
                   }
