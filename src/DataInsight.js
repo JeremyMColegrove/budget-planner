@@ -101,23 +101,23 @@ function DataInsight() {
             var total = 0;
             var averageConversion = 0
             for (var receipt of month.receipts) {
-                averageConversion += receipt.conversionRate
-              if (showUSD) {
-                total += receipt.USD
-                total += receipt.MXN / receipt.conversionRate
-              } else {
-                total += receipt.USD * receipt.conversionRate
-                total += receipt.MXN
-              }
+                averageConversion += parseFloat(receipt.conversionRate)
+                if (showUSD) {
+                    total += receipt.USD
+                    total += receipt.MXN / receipt.conversionRate
+                } else {
+                    total += receipt.USD * receipt.conversionRate
+                    total += receipt.MXN
+                }
             }
             averageConversion /= month.receipts.length
 
             // use average comparison for calculating expense price
             for (var expense of month.expenses) {
                 if (showUSD && expense.expenseCurrency == "MXN") {
-                    total += expense.price * averageConversion
-                  } else if (!showUSD && expense.expenseCurrency == "USD") {
                     total += expense.price / averageConversion
+                  } else if (!showUSD && expense.expenseCurrency == "USD") {
+                    total += expense.price * averageConversion
                   } else {
                     total += expense.price
                   }
@@ -140,51 +140,51 @@ function DataInsight() {
             m.expenses.forEach(e=>{
                 if (showUSD && e.expenseCurrency == "MXN") {
                     totalSpendingCat[6] += e.price / averageConversion
-                  } else if (!showUSD && e.expenseCurrency == "USD") {
+                } else if (!showUSD && e.expenseCurrency == "USD") {
                     totalSpendingCat[6] += e.price * averageConversion
-                  } else {
+                } else {
                     totalSpendingCat[6] += e.price
-                  }
+                }
             })
 
             m.receipts.forEach(r=>r.transactions.forEach(t=>{
-            t.price = parseFloat(t.price)
-            r.conversionRate = parseFloat(r.conversionRate)
+                t.price = parseFloat(t.price)
+                r.conversionRate = parseFloat(r.conversionRate)
 
-            // convert the amount to the correct currency
-            if (showUSD && t.transactionCurrency == "MXN") {
-                t.price = moneyRound((t.price / r.conversionRate))
-            } else if (!showUSD && t.transactionCurrency == "USD") {
-                t.price = moneyRound((t.price * r.conversionRate))
-            }
+                // convert the amount to the correct currency
+                if (showUSD && t.transactionCurrency == "MXN") {
+                    t.price = moneyRound((t.price / r.conversionRate))
+                } else if (!showUSD && t.transactionCurrency == "USD") {
+                    t.price = moneyRound((t.price * r.conversionRate))
+                }
 
-            // for each transaction, get the catagory
-            switch (t.catagory) {
-                case "Food":
-                    totalSpendingCat[0]+= t.price;
-                    break;
-                case "Entertainment":
-                    totalSpendingCat[1]+= t.price;
-                    break;
-                case "Transportation":
-                    totalSpendingCat[2]+= t.price;
-                    break;
-                case "Personal Care":
-                    totalSpendingCat[3]+= t.price;
-                    break;
-                case "Clothing":
-                    totalSpendingCat[4]+= t.price;
-                    break;
-                case "Miscellaneous":
-                    totalSpendingCat[5]+= t.price;
-                    break;
-            }
-       }))})
+                // for each transaction, get the catagory
+                switch (t.catagory) {
+                    case "Food":
+                        totalSpendingCat[0]+= t.price;
+                        break;
+                    case "Entertainment":
+                        totalSpendingCat[1]+= t.price;
+                        break;
+                    case "Transportation":
+                        totalSpendingCat[2]+= t.price;
+                        break;
+                    case "Personal Care":
+                        totalSpendingCat[3]+= t.price;
+                        break;
+                    case "Clothing":
+                        totalSpendingCat[4]+= t.price;
+                        break;
+                    case "Miscellaneous":
+                        totalSpendingCat[5]+= t.price;
+                        break;
+                }
+        }))})
 
         setDoughnutData(s=>{
             s = JSON.parse(JSON.stringify(s))
             s.datasets[0].data = totalSpendingCat
-            s.datasets[0].label = `Total ${showUSD?"(USD)":"(MXN"}`
+            s.datasets[0].label = `Total ${showUSD?"(USD)":"(MXN)"}`
             return s;
         })
     }
