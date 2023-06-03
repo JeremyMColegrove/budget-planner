@@ -75,7 +75,7 @@ function DataInsight() {
 
     const fetchData = async  () => {
         const db = new DexieDB()
-        const data = await db.fetchData();
+        const data = ((await db.fetchData()).sort((a,b)=>dayjs(a.monthName).isBefore(dayjs(b.monthName))?1:-1));
         setData(data)
     }
 
@@ -87,7 +87,7 @@ function DataInsight() {
         var datasetCopy = JSON.parse(JSON.stringify(data))
 
         if (selectedMonth > -1) {
-            datasetCopy.slice(selectedMonth, selectedMonth)
+            datasetCopy = [datasetCopy[selectedMonth]]
         } 
 
         
@@ -124,13 +124,13 @@ function DataInsight() {
             }
             // datasetCopy[i].total = total
             spending.push(total)
-            labels.push(dayjs(month.date).format("MMM"))
+            labels.push(dayjs(month.monthName).format("MMM"))
           }
 
           setMonthlySpendingData(s=>{
             s = JSON.parse(JSON.stringify(s))
-            s.datasets[0].data = spending
-            s.labels = labels
+            s.datasets[0].data = spending.reverse()
+            s.labels = labels.reverse()
             s.datasets[0].label = `Spending ${showUSD?"(USD)":"(MXN)"}`
             return s
           })
@@ -190,7 +190,7 @@ function DataInsight() {
     }
 
   const monthComponent = (month, index, children)=> {
-    return <div key={month.id} className={`w-30 mr-4 bg-slate-300 rounded-sm p-4 ${selectedMonth==index?"opacity-50":"hover:cursor-pointer hover:bg-slate-200"}`} onClick={()=>setSelectedMonth(index)}>
+    return <div key={index} className={`w-30 mr-4 bg-slate-300 rounded-sm p-4 ${selectedMonth==index?"opacity-50":"hover:cursor-pointer hover:bg-slate-200"}`} onClick={()=>setSelectedMonth(index)}>
         {children}
     </div>
   }
@@ -199,9 +199,9 @@ function DataInsight() {
     <div className='px-20 w-full'>
         {/* <p className='text-xl font-bold'>Month</p> */}
         <div className='flex my-6'>
-            {monthComponent({id:1}, -1, <p>All Months</p>)}
+            {monthComponent({id:-1}, -1, <p>All Months</p>)}
             {data.map((month, index)=>{
-                return monthComponent(month, index, <p>{dayjs(month.date).format("MMM YYYY")}</p>)
+                return monthComponent(month, index, <p>{dayjs(month.monthName).format("MMM YYYY")}</p>)
             })}
 
         </div>
