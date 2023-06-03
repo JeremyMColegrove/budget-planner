@@ -18,7 +18,7 @@ function Months() {
 
   async function fetchData() {
     const db = new DexieDB();
-    var months = await db.getMonths();
+    var months = (await db.getMonths()).sort((a,b)=>dayjs(a).isBefore(dayjs(b))?1:-1);
     for (var i = 0; i<months.length; i++) {
       var month = months[i]
       var receipts = await db.getReceiptsAndExpenses(month.id)
@@ -192,7 +192,6 @@ function Months() {
             {months.slice(1).map(month => monthComponent(month))}
             {months.length < 2 && "No Previous Months"}
         </div>
-      
     </div>
   );
 }
